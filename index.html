@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="vi">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Han Viet Glyph Lab</title>
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="study-panel" aria-label="Khu tập viết chữ Hán">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">Glyph Lab</p>
+            <h1>Vẽ chữ rồi hiểu chữ Hán</h1>
+          </div>
+          <div class="score-card" aria-label="Điểm và chuỗi học">
+            <span><strong id="xpValue">0</strong> XP</span>
+            <span><strong id="streakValue">1</strong> ngày</span>
+          </div>
+        </header>
+
+        <section class="quick-win" aria-label="Bài học nhanh">
+          <div class="quick-copy">
+            <p class="eyebrow">Quick win 2 phút</p>
+            <h2 id="missionTitle">Chào một người mới</h2>
+            <p id="missionGoal">
+              Học câu dùng ngay trước, rồi mới bóc chữ ra để vẽ và hiểu.
+            </p>
+          </div>
+
+          <div class="phrase-card" aria-live="polite">
+            <div>
+              <div id="phraseHanzi" class="phrase-hanzi">你好！</div>
+              <div id="phrasePinyin" class="phrase-pinyin">Nǐ hǎo!</div>
+              <p id="phraseMeaning" class="phrase-meaning">Xin chào.</p>
+            </div>
+            <div class="phrase-actions">
+              <button class="phrase-tab active" type="button" data-phrase="hello">Chào hỏi</button>
+              <button class="phrase-tab" type="button" data-phrase="name">Tên tôi là</button>
+              <button class="phrase-tab" type="button" data-phrase="askName">Hỏi tên</button>
+              <button class="phrase-tab" type="button" data-phrase="thanks">Cảm ơn</button>
+            </div>
+          </div>
+
+          <div class="name-practice">
+            <label for="nameInput">Thử thay tên của anh</label>
+            <div>
+              <input id="nameInput" type="text" value="Nam" autocomplete="off" />
+              <output id="nameOutput">我叫 Nam。</output>
+            </div>
+          </div>
+        </section>
+
+        <div class="phrase-strip" role="list" aria-label="Cụm từ đang học">
+          <button class="char-tab active" type="button" data-char="ni">
+            <span class="hanzi">你</span>
+            <span>nǐ - bạn</span>
+          </button>
+          <button class="char-tab" type="button" data-char="hao">
+            <span class="hanzi">好</span>
+            <span>hǎo - tốt</span>
+          </button>
+          <button class="char-tab compare" type="button" data-char="qiu">
+            <span class="hanzi">囚</span>
+            <span>dễ nhầm: tù</span>
+          </button>
+          <button class="char-tab" type="button" data-char="wo">
+            <span class="hanzi">我</span>
+            <span>wǒ - tôi</span>
+          </button>
+          <button class="char-tab" type="button" data-char="jiao">
+            <span class="hanzi">叫</span>
+            <span>jiào - gọi/là</span>
+          </button>
+        </div>
+
+        <section class="workspace" aria-label="Bảng luyện viết">
+          <div class="writing-board">
+            <div class="board-header">
+              <div>
+                <p id="charPinyin" class="pinyin">nǐ</p>
+                <div class="target-char" id="targetChar">你</div>
+              </div>
+              <div class="mode-pill" id="strokeCount">7 nét</div>
+            </div>
+
+            <div class="grid-stage" id="gridStage">
+              <svg id="guideSvg" class="guide-svg" viewBox="0 0 420 420" aria-hidden="true"></svg>
+              <canvas id="drawCanvas" width="420" height="420" aria-label="Vùng vẽ chữ"></canvas>
+            </div>
+
+            <div class="stroke-track" id="strokeTrack" aria-label="Thứ tự nét"></div>
+          </div>
+
+          <aside class="lesson-card" aria-label="Giải thích chữ">
+            <div class="lesson-head">
+              <p class="eyebrow">Giải mã chữ</p>
+              <h2 id="lessonTitle">你 = bạn</h2>
+            </div>
+            <p id="lessonMeaning" class="meaning"></p>
+            <div class="component-list" id="components"></div>
+            <div class="hint-box">
+              <strong id="mnemonicTitle">Mẹo nhớ</strong>
+              <p id="mnemonicText"></p>
+            </div>
+          </aside>
+        </section>
+
+        <footer class="controls" aria-label="Điều khiển game">
+          <button id="playBtn" class="primary-btn" type="button">Phát thứ tự nét</button>
+          <button id="checkBtn" type="button">Chấm nét vừa vẽ</button>
+          <button id="nextBtn" type="button">Nét tiếp</button>
+          <button id="clearBtn" type="button">Xóa bảng</button>
+        </footer>
+      </section>
+    </main>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
