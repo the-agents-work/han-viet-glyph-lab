@@ -18,6 +18,14 @@
             <span><strong id="xpValue">0</strong> XP</span>
             <span><strong id="streakValue">1</strong> ngày</span>
           </div>
+          <div class="account-card" aria-label="Tài khoản học">
+            <div>
+              <span id="accountName">Khách</span>
+              <small id="accountStatus">Progress chỉ lưu trên máy này</small>
+            </div>
+            <button id="authOpenBtn" class="primary-btn" type="button">Đăng nhập</button>
+            <button id="logoutBtn" type="button" hidden>Đăng xuất</button>
+          </div>
         </header>
 
         <section class="quick-win" aria-label="Bài học nhanh">
@@ -115,6 +123,44 @@
         </footer>
       </section>
     </main>
+
+    <dialog id="authDialog" class="auth-dialog" aria-labelledby="authTitle">
+      <form id="authForm" method="dialog">
+        <div class="auth-head">
+          <div>
+            <p class="eyebrow">Tài khoản học thử</p>
+            <h2 id="authTitle">Đăng nhập</h2>
+          </div>
+          <button id="authCloseBtn" class="icon-btn" value="cancel" type="button" aria-label="Đóng">
+            ×
+          </button>
+        </div>
+
+        <div class="auth-tabs" role="tablist" aria-label="Chọn đăng nhập hoặc đăng ký">
+          <button class="auth-tab active" type="button" data-auth-mode="login">Đăng nhập</button>
+          <button class="auth-tab" type="button" data-auth-mode="signup">Đăng ký</button>
+        </div>
+
+        <label class="auth-field" id="displayNameField">
+          Tên hiển thị
+          <input id="displayNameInput" name="displayName" type="text" autocomplete="name" placeholder="Ví dụ: Nghĩa" />
+        </label>
+
+        <label class="auth-field">
+          Email
+          <input id="emailInput" name="email" type="email" autocomplete="email" required placeholder="ban@example.com" />
+        </label>
+
+        <label class="auth-field">
+          Mật khẩu
+          <input id="passwordInput" name="password" type="password" autocomplete="current-password" required minlength="6" placeholder="Ít nhất 6 ký tự" />
+        </label>
+
+        <p id="authMessage" class="auth-message" role="status"></p>
+
+        <button id="authSubmitBtn" class="primary-btn auth-submit" type="submit">Đăng nhập</button>
+      </form>
+    </dialog>
 
     <script src="./app.js"></script>
   </body>

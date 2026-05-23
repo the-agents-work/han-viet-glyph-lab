@@ -186,6 +186,10 @@ const phraseDeck = {
   }
 };
 
+const authStorageKey = "han-viet-glyph-lab-users";
+const sessionStorageKey = "han-viet-glyph-lab-session";
+const guestProgressKey = "han-viet-glyph-lab-guest-progress";
+
 const state = {
   activeKey: "ni",
   activePhrase: "hello",
@@ -194,7 +198,9 @@ const state = {
   drawing: false,
   userPoints: [],
   xp: 0,
-  streak: 1
+  streak: 1,
+  authMode: "login",
+  currentUser: null
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -202,6 +208,233 @@ const guideSvg = $("#guideSvg");
 const canvas = $("#drawCanvas");
 const ctx = canvas.getContext("2d");
 const strokeTrack = $("#strokeTrack");
+const authDialog = $("#authDialog");
+
+function getUsers() {
+  try {
+    return JSON.parse(localStorage.getItem(authStorageKey)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUsers(users) {
+  localStorage.setItem(authStorageKey, JSON.stringify(users));
+}
+
+function normalizeEmail(email) {
+  return email.trim().toLowerCase();
+}
+
+function makeSalt() {
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function sha256(value) {
+  const data = new TextEncoder().encode(value);
+  const hash = await crypto.subtle.digest("SHA-256", data);
+  return Array.from(new Uint8Array(hash), (byte) => byte.toString(16).padStart(2, "0")).join("");
+}
+
+async function hashPassword(password, salt) {
+  return sha256(`${salt}:${password}`);
+}
+
+function getProgressKey() {
+  return state.currentUser ? `${authStorageKey}:${state.currentUser.email}:progress` : guestProgressKey;
+}
+
+function readProgress() {
+  try {
+    return JSON.parse(localStorage.getItem(getProgressKey())) || {};
+  } catch {
+    return {};
+  }
+}
+
+function hasProgressFor(email) {
+  return Boolean(localStorage.getItem(`${authStorageKey}:${email}:progress`));
+}
+
+function readGuestProgress() {
+  try {
+    return JSON.parse(localStorage.getItem(guestProgressKey)) || null;
+  } catch {
+    return null;
+  }
+}
+
+function saveProgress() {
+  const progress = {
+    xp: state.xp,
+    streak: state.streak,
+    activePhrase: state.activePhrase,
+    activeKey: state.activeKey,
+    displayName: state.currentUser?.displayName || null,
+    updatedAt: new Date().toISOString()
+  };
+  localStorage.setItem(getProgressKey(), JSON.stringify(progress));
+}
+
+function loadProgress() {
+  const progress = readProgress();
+  state.xp = Number.isFinite(progress.xp) ? progress.xp : 0;
+  state.streak = Number.isFinite(progress.streak) ? progress.streak : 1;
+  if (progress.activePhrase && phraseDeck[progress.activePhrase]) {
+    state.activePhrase = progress.activePhrase;
+  }
+  if (progress.activeKey && glyphs[progress.activeKey]) {
+    state.activeKey = progress.activeKey;
+  } else {
+    state.activeKey = phraseDeck[state.activePhrase].focus;
+  }
+}
+
+function syncScore() {
+  $("#xpValue").textContent = state.xp;
+  $("#streakValue").textContent = state.streak;
+}
+
+function renderAccount() {
+  const accountName = state.currentUser?.displayName || "Khách";
+  $("#accountName").textContent = accountName;
+  $("#accountStatus").textContent = state.currentUser
+    ? `${state.currentUser.email} · progress đã lưu`
+    : "Progress chỉ lưu trên máy này";
+  $("#authOpenBtn").hidden = Boolean(state.currentUser);
+  $("#logoutBtn").hidden = !state.currentUser;
+}
+
+function loadSession() {
+  const email = localStorage.getItem(sessionStorageKey);
+  if (!email) return;
+
+  const users = getUsers();
+  if (users[email]) {
+    state.currentUser = {
+      email,
+      displayName: users[email].displayName
+    };
+  } else {
+    localStorage.removeItem(sessionStorageKey);
+  }
+}
+
+function setAuthMode(mode) {
+  state.authMode = mode;
+  const isSignup = mode === "signup";
+  $("#authTitle").textContent = isSignup ? "Đăng ký" : "Đăng nhập";
+  $("#authSubmitBtn").textContent = isSignup ? "Tạo tài khoản" : "Đăng nhập";
+  $("#displayNameField").hidden = !isSignup;
+  $("#passwordInput").autocomplete = isSignup ? "new-password" : "current-password";
+  setAuthMessage("");
+
+  document.querySelectorAll(".auth-tab").forEach((tab) => {
+    tab.classList.toggle("active", tab.dataset.authMode === mode);
+  });
+}
+
+function setAuthMessage(message, kind = "error") {
+  const element = $("#authMessage");
+  element.textContent = message;
+  element.classList.toggle("success", kind === "success");
+}
+
+function openAuthDialog(mode = "login") {
+  setAuthMode(mode);
+  $("#authForm").reset();
+  if (authDialog.showModal) {
+    authDialog.showModal();
+  } else {
+    authDialog.setAttribute("open", "");
+  }
+  $("#emailInput").focus();
+}
+
+function closeAuthDialog() {
+  authDialog.close?.();
+  authDialog.removeAttribute("open");
+}
+
+async function submitAuth(event) {
+  event.preventDefault();
+  const email = normalizeEmail($("#emailInput").value);
+  const password = $("#passwordInput").value;
+  const displayName = $("#displayNameInput").value.trim() || email.split("@")[0] || "Bạn học";
+
+  if (!email || password.length < 6) {
+    setAuthMessage("Email hợp lệ và mật khẩu từ 6 ký tự nha.");
+    return;
+  }
+
+  const users = getUsers();
+  const existing = users[email];
+
+  if (state.authMode === "signup") {
+    if (existing) {
+      setAuthMessage("Email này đã có tài khoản. Chuyển qua đăng nhập nha.");
+      return;
+    }
+
+    const salt = makeSalt();
+    users[email] = {
+      email,
+      displayName,
+      salt,
+      passwordHash: await hashPassword(password, salt),
+      createdAt: new Date().toISOString()
+    };
+    saveUsers(users);
+    loginAs(users[email]);
+    setAuthMessage("Tạo tài khoản xong, progress sẽ lưu theo user này.", "success");
+    setTimeout(closeAuthDialog, 450);
+    return;
+  }
+
+  if (!existing) {
+    setAuthMessage("Chưa có tài khoản này. Bấm Đăng ký để tạo mới.");
+    return;
+  }
+
+  const passwordHash = await hashPassword(password, existing.salt);
+  if (passwordHash !== existing.passwordHash) {
+    setAuthMessage("Mật khẩu chưa đúng.");
+    return;
+  }
+
+  loginAs(existing);
+  setAuthMessage("Đăng nhập xong.", "success");
+  setTimeout(closeAuthDialog, 450);
+}
+
+function loginAs(user) {
+  const guestProgress = readGuestProgress();
+  state.currentUser = {
+    email: user.email,
+    displayName: user.displayName
+  };
+  localStorage.setItem(sessionStorageKey, user.email);
+  if (!hasProgressFor(user.email) && guestProgress) {
+    localStorage.setItem(getProgressKey(), JSON.stringify(guestProgress));
+  }
+  loadProgress();
+  syncScore();
+  renderAccount();
+  renderPhrase();
+  renderGlyph();
+}
+
+function logout() {
+  saveProgress();
+  state.currentUser = null;
+  localStorage.removeItem(sessionStorageKey);
+  loadProgress();
+  syncScore();
+  renderAccount();
+  renderPhrase();
+  renderGlyph();
+}
 
 function renderGlyph() {
   const glyph = glyphs[state.activeKey];
@@ -355,7 +588,8 @@ function checkCurrentStroke() {
   if (score >= 42) {
     state.completed.add(state.currentStroke);
     state.xp += 10;
-    $("#xpValue").textContent = state.xp;
+    syncScore();
+    saveProgress();
     nextStroke();
   } else {
     flashBoard();
@@ -368,7 +602,8 @@ function nextStroke() {
     state.currentStroke += 1;
   } else if (state.completed.size >= glyph.strokes.length) {
     state.xp += 40;
-    $("#xpValue").textContent = state.xp;
+    syncScore();
+    saveProgress();
   }
   state.userPoints = [];
   renderGuide();
@@ -421,6 +656,7 @@ document.querySelectorAll(".phrase-tab").forEach((button) => {
     state.activeKey = phraseDeck[state.activePhrase].focus;
     renderPhrase();
     renderGlyph();
+    saveProgress();
   });
 });
 
@@ -450,5 +686,18 @@ $("#clearBtn").addEventListener("click", () => {
   renderStrokeTrack();
 });
 
+$("#authOpenBtn").addEventListener("click", () => openAuthDialog("login"));
+$("#logoutBtn").addEventListener("click", logout);
+$("#authCloseBtn").addEventListener("click", closeAuthDialog);
+$("#authForm").addEventListener("submit", submitAuth);
+document.querySelectorAll(".auth-tab").forEach((button) => {
+  button.addEventListener("click", () => setAuthMode(button.dataset.authMode));
+});
+
+loadSession();
+loadProgress();
+syncScore();
+renderAccount();
+setAuthMode("login");
 renderPhrase();
 renderGlyph();

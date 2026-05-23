@@ -9,6 +9,16 @@ Prototype game học chữ Hán cho người Việt: học câu dùng ngay, rồ
 - `你叫什么名字？` - Bạn tên là gì?
 - `谢谢！` - Cảm ơn.
 
+## Account prototype
+
+App có flow đăng ký, đăng nhập và đăng xuất để thử UX tài khoản học. Vì bản này đang chạy hoàn toàn trên GitHub Pages, tài khoản và progress được lưu bằng `localStorage` trong trình duyệt:
+
+- mỗi email có XP/streak riêng,
+- đăng xuất quay về chế độ khách,
+- đăng nhập lại khôi phục progress của user đó.
+
+Đây là auth prototype để test sản phẩm, chưa phải hệ thống tài khoản production. Bản production nên nối Supabase Auth, Firebase Auth hoặc backend riêng.
+
 ## Chạy local
 
 ```bash

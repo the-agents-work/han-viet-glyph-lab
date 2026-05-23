@@ -120,6 +120,37 @@ h2 {
   justify-content: flex-end;
 }
 
+.account-card {
+  display: grid;
+  grid-template-columns: minmax(130px, 1fr) auto auto;
+  gap: 8px;
+  align-items: center;
+  min-width: min(100%, 420px);
+  padding: 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 253, 247, 0.72);
+}
+
+.account-card span,
+.account-card small {
+  display: block;
+}
+
+.account-card span {
+  font-weight: 850;
+}
+
+.account-card small {
+  color: var(--ink-soft);
+  line-height: 1.2;
+}
+
+.account-card button {
+  padding: 8px 12px;
+  min-height: 40px;
+}
+
 .score-card span,
 .mode-pill {
   display: inline-flex;
@@ -513,6 +544,87 @@ h2 {
   background: #b84352;
 }
 
+.auth-dialog {
+  width: min(440px, calc(100vw - 28px));
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 0;
+  color: var(--ink);
+  background: #fffaf0;
+  box-shadow: var(--shadow);
+}
+
+.auth-dialog::backdrop {
+  background: rgba(28, 48, 64, 0.38);
+  backdrop-filter: blur(3px);
+}
+
+.auth-dialog form {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+}
+
+.auth-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.auth-head h2 {
+  margin-bottom: 0;
+}
+
+.icon-btn {
+  width: 40px;
+  min-height: 40px;
+  padding: 0;
+  font-size: 1.5rem;
+}
+
+.auth-tabs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.auth-tab.active {
+  color: white;
+  background: var(--blue);
+  border-color: rgba(44, 107, 147, 0.45);
+}
+
+.auth-field {
+  display: grid;
+  gap: 6px;
+  font-weight: 850;
+}
+
+.auth-field input {
+  min-height: 44px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: var(--ink);
+  background: white;
+  font: inherit;
+}
+
+.auth-message {
+  min-height: 22px;
+  margin: 0;
+  color: var(--seal);
+  font-weight: 750;
+}
+
+.auth-message.success {
+  color: #1f594d;
+}
+
+.auth-submit {
+  width: 100%;
+}
+
 @media (max-width: 860px) {
   .topbar {
     align-items: flex-start;
@@ -521,6 +633,11 @@ h2 {
 
   .score-card {
     justify-content: flex-start;
+  }
+
+  .account-card {
+    grid-template-columns: 1fr;
+    width: 100%;
   }
 
   .workspace {
