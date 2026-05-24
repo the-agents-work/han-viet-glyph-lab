@@ -4,15 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Han Viet Glyph Lab</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Be+Vietnam+Pro:wght@400;500;650;750;850&family=Noto+Serif+SC:wght@500;700;900&display=swap&subset=vietnamese,latin"
+      rel="stylesheet"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
     <main class="app-shell">
       <section class="study-panel" aria-label="Khu tập viết chữ Hán">
         <header class="topbar">
-          <div>
+          <div class="brand-block">
             <p class="eyebrow">Glyph Lab</p>
-            <h1>Vẽ chữ rồi hiểu chữ Hán</h1>
+            <h1>Luyện chữ Hán theo nhiệm vụ</h1>
+            <p>Học câu dùng ngay, chọn chữ trọng tâm, viết từng nét và chấm độ khớp.</p>
           </div>
           <div class="score-card" aria-label="Điểm và chuỗi học">
             <span><strong id="xpValue">0</strong> XP</span>
@@ -28,89 +35,127 @@
           </div>
         </header>
 
-        <section class="quick-win" aria-label="Bài học nhanh">
-          <div class="quick-copy">
-            <p class="eyebrow">Quick win 2 phút</p>
-            <h2 id="missionTitle">Chào một người mới</h2>
-            <p id="missionGoal">
-              Học câu dùng ngay trước, rồi mới bóc chữ ra để vẽ và hiểu.
-            </p>
+        <section class="learning-flow" aria-label="Luồng học hiện tại">
+          <div class="flow-step active">
+            <span>1</span>
+            <strong>Chọn nhiệm vụ</strong>
+            <small>Câu giao tiếp ngắn</small>
           </div>
+          <div class="flow-step active">
+            <span>2</span>
+            <strong>Tách chữ</strong>
+            <small>Chữ trọng tâm</small>
+          </div>
+          <div class="flow-step active">
+            <span>3</span>
+            <strong>Viết nét</strong>
+            <small>Theo nét xanh</small>
+          </div>
+          <div class="flow-step">
+            <span>4</span>
+            <strong>Chấm điểm</strong>
+            <small>Đạt từ 80%</small>
+          </div>
+        </section>
 
-          <div class="phrase-card" aria-live="polite">
-            <div>
-              <div id="phraseHanzi" class="phrase-hanzi">你好！</div>
-              <div id="phrasePinyin" class="phrase-pinyin">Nǐ hǎo!</div>
-              <p id="phraseMeaning" class="phrase-meaning">Xin chào.</p>
+        <section class="workspace" aria-label="Studio luyện viết">
+          <aside class="lesson-rail" aria-label="Lộ trình bài học">
+            <div class="quick-copy">
+              <p class="eyebrow">Quick win 2 phút</p>
+              <h2 id="missionTitle">Chào một người mới</h2>
+              <p id="missionGoal">
+                Học câu dùng ngay trước, rồi mới bóc chữ ra để vẽ và hiểu.
+              </p>
             </div>
+
             <div class="phrase-actions">
               <button class="phrase-tab active" type="button" data-phrase="hello">Chào hỏi</button>
               <button class="phrase-tab" type="button" data-phrase="name">Tên tôi là</button>
               <button class="phrase-tab" type="button" data-phrase="askName">Hỏi tên</button>
               <button class="phrase-tab" type="button" data-phrase="thanks">Cảm ơn</button>
             </div>
-          </div>
 
-          <div class="name-practice">
-            <label for="nameInput">Thử thay tên của anh</label>
-            <div>
-              <input id="nameInput" type="text" value="Nam" autocomplete="off" />
-              <output id="nameOutput">我叫 Nam。</output>
-            </div>
-          </div>
-        </section>
-
-        <div class="phrase-strip" role="list" aria-label="Cụm từ đang học">
-          <button class="char-tab active" type="button" data-char="ni">
-            <span class="hanzi">你</span>
-            <span>nǐ - bạn</span>
-          </button>
-          <button class="char-tab" type="button" data-char="hao">
-            <span class="hanzi">好</span>
-            <span>hǎo - tốt</span>
-          </button>
-          <button class="char-tab compare" type="button" data-char="qiu">
-            <span class="hanzi">囚</span>
-            <span>dễ nhầm: tù</span>
-          </button>
-          <button class="char-tab" type="button" data-char="wo">
-            <span class="hanzi">我</span>
-            <span>wǒ - tôi</span>
-          </button>
-          <button class="char-tab" type="button" data-char="jiao">
-            <span class="hanzi">叫</span>
-            <span>jiào - gọi/là</span>
-          </button>
-        </div>
-
-        <section class="workspace" aria-label="Bảng luyện viết">
-          <div class="writing-board">
-            <div class="board-header">
+            <div class="name-practice">
+              <label for="nameInput">Tên của anh</label>
               <div>
-                <p id="charPinyin" class="pinyin">nǐ</p>
-                <div class="target-char" id="targetChar">你</div>
+                <input id="nameInput" type="text" value="Nam" autocomplete="off" />
+                <output id="nameOutput">我叫 Nam。</output>
               </div>
-              <div class="mode-pill" id="strokeCount">7 nét</div>
+            </div>
+          </aside>
+
+          <section class="practice-studio" aria-label="Bảng luyện viết">
+            <div class="writing-board">
+              <div class="board-header">
+                <div>
+                  <p id="charPinyin" class="pinyin">nǐ</p>
+                  <div class="target-char" id="targetChar">你</div>
+                </div>
+                <div class="mode-pill" id="strokeCount">7 nét</div>
+              </div>
+
+              <div class="grid-stage" id="gridStage">
+                <svg id="guideSvg" class="guide-svg" viewBox="0 0 420 420" aria-hidden="true"></svg>
+                <canvas id="drawCanvas" width="420" height="420" aria-label="Vùng vẽ chữ"></canvas>
+              </div>
+
+              <div class="practice-tools" aria-label="Điều khiển luyện viết">
+                <button id="playBtn" class="primary-btn" type="button">Phát thứ tự nét</button>
+                <button id="checkBtn" type="button">Chấm nét vừa vẽ</button>
+                <button id="nextBtn" type="button">Nét tiếp</button>
+                <button id="clearBtn" type="button">Xóa bảng</button>
+              </div>
+
+              <div class="stroke-track" id="strokeTrack" aria-label="Thứ tự nét"></div>
+
+              <div class="score-panel" aria-live="polite">
+                <div class="score-readout">
+                  <span id="scorePercent">--%</span>
+                  <strong id="scoreVerdict">Chưa chấm</strong>
+                </div>
+                <div class="score-meter" aria-label="Mức khớp nét">
+                  <div id="scoreBar"></div>
+                </div>
+                <p id="scoreHint">Vẽ theo nét đang tô xanh, rồi bấm “Chấm nét vừa vẽ”. Đạt từ 80% là qua.</p>
+              </div>
             </div>
 
-            <div class="grid-stage" id="gridStage">
-              <svg id="guideSvg" class="guide-svg" viewBox="0 0 420 420" aria-hidden="true"></svg>
-              <canvas id="drawCanvas" width="420" height="420" aria-label="Vùng vẽ chữ"></canvas>
+            <div class="phrase-card" aria-live="polite">
+              <div>
+                <div id="phraseHanzi" class="phrase-hanzi">你好！</div>
+                <div id="phrasePinyin" class="phrase-pinyin">Nǐ hǎo!</div>
+                <p id="phraseMeaning" class="phrase-meaning">Xin chào.</p>
+              </div>
+              <div class="phrase-status">
+                <span>Đang luyện</span>
+                <strong id="practiceFocusLabel">你</strong>
+                <small>Chọn chữ bên dưới để đổi trọng tâm.</small>
+              </div>
             </div>
 
-            <div class="stroke-track" id="strokeTrack" aria-label="Thứ tự nét"></div>
-
-            <div class="score-panel" aria-live="polite">
-              <div class="score-readout">
-                <span id="scorePercent">--%</span>
-                <strong id="scoreVerdict">Chưa chấm</strong>
-              </div>
-              <div class="score-meter" aria-label="Mức khớp nét">
-                <div id="scoreBar"></div>
-              </div>
-              <p id="scoreHint">Vẽ theo nét đang tô xanh, rồi bấm “Chấm nét vừa vẽ”. Đạt từ 80% là qua.</p>
+            <div class="phrase-strip" role="list" aria-label="Cụm từ đang học">
+              <button class="char-tab active" type="button" data-char="ni">
+                <span class="hanzi">你</span>
+                <span>nǐ - bạn</span>
+              </button>
+              <button class="char-tab" type="button" data-char="hao">
+                <span class="hanzi">好</span>
+                <span>hǎo - tốt</span>
+              </button>
+              <button class="char-tab compare" type="button" data-char="qiu">
+                <span class="hanzi">囚</span>
+                <span>dễ nhầm: tù</span>
+              </button>
+              <button class="char-tab" type="button" data-char="wo">
+                <span class="hanzi">我</span>
+                <span>wǒ - tôi</span>
+              </button>
+              <button class="char-tab" type="button" data-char="jiao">
+                <span class="hanzi">叫</span>
+                <span>jiào - gọi/là</span>
+              </button>
             </div>
-          </div>
+          </section>
 
           <aside class="lesson-card" aria-label="Giải thích chữ">
             <div class="lesson-head">
@@ -125,13 +170,6 @@
             </div>
           </aside>
         </section>
-
-        <footer class="controls" aria-label="Điều khiển game">
-          <button id="playBtn" class="primary-btn" type="button">Phát thứ tự nét</button>
-          <button id="checkBtn" type="button">Chấm nét vừa vẽ</button>
-          <button id="nextBtn" type="button">Nét tiếp</button>
-          <button id="clearBtn" type="button">Xóa bảng</button>
-        </footer>
       </section>
     </main>
 

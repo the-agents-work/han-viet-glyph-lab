@@ -485,6 +485,7 @@ function renderGlyph() {
   state.lastScore = null;
 
   $("#targetChar").textContent = glyph.char;
+  $("#practiceFocusLabel").textContent = glyph.char;
   $("#charPinyin").textContent = glyph.pinyin;
   $("#strokeCount").textContent = `${glyph.strokes.length} nét`;
   $("#lessonTitle").textContent = glyph.title;
