@@ -56,6 +56,12 @@ button:hover {
   border-color: rgba(28, 48, 64, 0.4);
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.54;
+  transform: none;
+}
+
 .app-shell {
   width: min(1240px, calc(100vw - 28px));
   margin: 18px auto;
@@ -463,6 +469,75 @@ h2 {
   color: #1f594d;
   border-color: rgba(63, 138, 120, 0.45);
   background: #e8f5ed;
+}
+
+.score-panel {
+  display: grid;
+  gap: 8px;
+  margin-top: 14px;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.68);
+}
+
+.score-readout {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+#scorePercent {
+  color: var(--blue);
+  font-size: 1.55rem;
+  font-weight: 900;
+}
+
+#scoreVerdict {
+  color: var(--ink-soft);
+}
+
+.score-panel.pass #scorePercent,
+.score-panel.pass #scoreVerdict {
+  color: #1f594d;
+}
+
+.score-panel.fail #scorePercent,
+.score-panel.fail #scoreVerdict {
+  color: var(--seal);
+}
+
+.score-meter {
+  height: 12px;
+  overflow: hidden;
+  border: 1px solid rgba(28, 48, 64, 0.16);
+  border-radius: 999px;
+  background: #efe7d8;
+}
+
+#scoreBar {
+  width: 0%;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--blue);
+  transition:
+    width 180ms ease,
+    background 180ms ease;
+}
+
+.score-panel.pass #scoreBar {
+  background: var(--jade);
+}
+
+.score-panel.fail #scoreBar {
+  background: var(--seal);
+}
+
+#scoreHint {
+  margin: 0;
+  color: var(--ink-soft);
+  line-height: 1.42;
 }
 
 .lesson-card {

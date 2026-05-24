@@ -189,6 +189,7 @@ const phraseDeck = {
 const authStorageKey = "han-viet-glyph-lab-users";
 const sessionStorageKey = "han-viet-glyph-lab-session";
 const guestProgressKey = "han-viet-glyph-lab-guest-progress";
+const scorePassThreshold = 80;
 
 const state = {
   activeKey: "ni",
@@ -199,6 +200,7 @@ const state = {
   userPoints: [],
   xp: 0,
   streak: 1,
+  lastScore: null,
   authMode: "login",
   currentUser: null
 };
@@ -294,6 +296,45 @@ function loadProgress() {
 function syncScore() {
   $("#xpValue").textContent = state.xp;
   $("#streakValue").textContent = state.streak;
+}
+
+function updateScorePanel(score = null) {
+  const panel = document.querySelector(".score-panel");
+  const percent = $("#scorePercent");
+  const verdict = $("#scoreVerdict");
+  const hint = $("#scoreHint");
+  const bar = $("#scoreBar");
+
+  panel.classList.remove("pass", "fail");
+
+  if (score === null) {
+    percent.textContent = "--%";
+    verdict.textContent = "Chưa chấm";
+    hint.textContent = `Vẽ theo nét đang tô xanh, rồi bấm “Chấm nét vừa vẽ”. Đạt từ ${scorePassThreshold}% là qua.`;
+    bar.style.width = "0%";
+    syncNextButton();
+    return;
+  }
+
+  const clampedScore = Math.max(0, Math.min(100, score));
+  const passed = clampedScore >= scorePassThreshold;
+  percent.textContent = `${clampedScore}%`;
+  verdict.textContent = passed ? "Đạt" : "Chưa đạt";
+  hint.textContent = passed
+    ? "Nét này đủ khớp. Bấm “Nét tiếp” để qua nét kế."
+    : `Cần từ ${scorePassThreshold}%. Vẽ sát nét xanh hơn rồi chấm lại.`;
+  bar.style.width = `${clampedScore}%`;
+  panel.classList.add(passed ? "pass" : "fail");
+  syncNextButton();
+}
+
+function syncNextButton() {
+  const glyph = glyphs[state.activeKey];
+  const isCurrentDone = state.completed.has(state.currentStroke);
+  const isLastStroke = state.currentStroke >= glyph.strokes.length - 1;
+  const nextButton = $("#nextBtn");
+  nextButton.disabled = !isCurrentDone || isLastStroke;
+  nextButton.textContent = isLastStroke && isCurrentDone ? "Đã xong" : "Nét tiếp";
 }
 
 function renderAccount() {
@@ -441,6 +482,7 @@ function renderGlyph() {
   state.currentStroke = 0;
   state.completed = new Set();
   state.userPoints = [];
+  state.lastScore = null;
 
   $("#targetChar").textContent = glyph.char;
   $("#charPinyin").textContent = glyph.pinyin;
@@ -471,6 +513,7 @@ function renderGlyph() {
   renderGuide();
   renderStrokeTrack();
   clearCanvas();
+  updateScorePanel();
 }
 
 function renderPhrase() {
@@ -509,6 +552,7 @@ function renderStrokeTrack() {
       return `<span class="${classes.join(" ")}">${index + 1}. ${stroke.name}</span>`;
     })
     .join("");
+  syncNextButton();
 }
 
 function clearCanvas() {
@@ -585,12 +629,24 @@ function distance(a, b) {
 
 function checkCurrentStroke() {
   const score = scoreStroke();
-  if (score >= 42) {
+  state.lastScore = score;
+  updateScorePanel(score);
+
+  if (score >= scorePassThreshold) {
+    const wasAlreadyDone = state.completed.has(state.currentStroke);
     state.completed.add(state.currentStroke);
-    state.xp += 10;
-    syncScore();
-    saveProgress();
-    nextStroke();
+    if (!wasAlreadyDone) {
+      state.xp += 10;
+      const glyph = glyphs[state.activeKey];
+      if (state.completed.size >= glyph.strokes.length) {
+        state.xp += 40;
+        $("#scoreHint").textContent = "Hoàn thành chữ này. Nhận thêm XP hoàn thành.";
+      }
+      syncScore();
+      saveProgress();
+    }
+    renderGuide();
+    renderStrokeTrack();
   } else {
     flashBoard();
   }
@@ -598,16 +654,21 @@ function checkCurrentStroke() {
 
 function nextStroke() {
   const glyph = glyphs[state.activeKey];
+  if (!state.completed.has(state.currentStroke)) {
+    $("#scoreHint").textContent = `Chấm đạt ${scorePassThreshold}% trước rồi mới qua nét tiếp.`;
+    flashBoard();
+    syncNextButton();
+    return;
+  }
+
   if (state.currentStroke < glyph.strokes.length - 1) {
     state.currentStroke += 1;
-  } else if (state.completed.size >= glyph.strokes.length) {
-    state.xp += 40;
-    syncScore();
-    saveProgress();
   }
   state.userPoints = [];
+  state.lastScore = null;
   renderGuide();
   renderStrokeTrack();
+  updateScorePanel();
 }
 
 function flashBoard() {
@@ -681,9 +742,11 @@ $("#clearBtn").addEventListener("click", () => {
   state.completed = new Set();
   state.currentStroke = 0;
   state.userPoints = [];
+  state.lastScore = null;
   clearCanvas();
   renderGuide();
   renderStrokeTrack();
+  updateScorePanel();
 });
 
 $("#authOpenBtn").addEventListener("click", () => openAuthDialog("login"));
